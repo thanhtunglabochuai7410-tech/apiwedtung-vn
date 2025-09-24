@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PlayGame APK</title>
+  <style>
+    :root{font-family:Inter, Roboto, Arial, sans-serif;color:#111}
+    body{margin:0;padding:32px;background:#f6f7fb;display:flex;align-items:center;justify-content:center;min-height:100vh}
+    .card{width:100%;max-width:760px;background:#fff;border-radius:12px;box-shadow:0 6px 24px rgba(20,20,50,.08);padding:28px}
+    h1{margin:0 0 10px;font-size:20px}
+    p.lead{margin:0 0 18px;color:#444}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    label{display:block;font-size:13px;color:#666;margin-bottom:6px}
+    input[type="text"], input[type="url"]{width:100%;padding:10px;border:1px solid #e4e6ef;border-radius:8px}
+    .controls{display:flex;gap:10px;margin-top:12px}
+    button{padding:10px 14px;border-radius:10px;border:0;background:#0b84ff;color:#fff;font-weight:600;cursor:pointer}
+    button.secondary{background:#eee;color:#222}
+    .info{margin-top:18px;font-size:13px;color:#444}
+    .note{background:#fff9e6;padding:10px;border-radius:8px;border:1px solid #f1e3c6;margin-top:14px}
+    .steps{margin-top:14px}
+    .hashBox{margin-top:10px;font-family:monospace;background:#f4f6fb;padding:10px;border-radius:8px}
+    footer{margin-top:18px;font-size:12px;color:#888}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Dowload APK</h1>
+    <p class="lead">Mẫu trang HTML để cho phép người dùng tải file APK. Thay <code>APK_URL</code> bằng đường dẫn file thực tế của bạn.</p>
+
+    <div>
+      <label for="apkUrl">URL file APK</label>
+      <input id="apkUrl" type="url" placeholder="https://www.mediafire.com/file/mu7l0hkafnnqbs6/PlayMod.apk/file" value="https://www.mediafire.com/file/mu7l0hkafnnqbs6/PlayMod.apk/file">
+    </div>
+  <div class="controls">
+      <button id="setBtn">Sử dụng URL này</button>
+      <button id="downloadBtn" disabled>↓ Tải file APK</button>
+      <button id="hashBtn" class="secondary" title="Tính SHA-256 (yêu cầu CORS)">🔒 Tính SHA-256</button>
+    </div>
+
+    <div class="info">
+      <div>Trạng thái: <span id="status">Chưa sẵn sàng</span></div>
+      <div class="hashBox" id="hashBox" style="display:none">SHA-256: <span id="hashVal">—</span></div>
+    </div>
+
+    <div class="note">
+      <strong>Lưu ý vận hành:</strong>
+      <ul>
+        <li>File APK phải được host trên server với header <code>Content-Type: application/vnd.android.package-archive</code>.</li>
+        <li>Nếu bạn muốn tính toán checksum hoặc fetch file bằng JavaScript, server phải cho phép <code>Access-Control-Allow-Origin: *</code> (hoặc domain của bạn).</li>
+        <li>Trình duyệt Android thường mở trực tiếp link tải (người dùng cần bật <em>Unknown Sources</em> để cài file ngoài Play Store).</li>
+      </ul>
+    </div>
+
+    <div class="steps">
+      <strong>Hướng dẫn cài đặt (người dùng Android):</strong>
+      <ol>
+        <li>Tải file APK bằng nút “Tải file APK”.</li>
+        <li>Mở file đã tải trong trình quản lý file hoặc thanh thông báo.</li>
+        <li>Nếu cần, cho phép cài ứng dụng từ nguồn không xác định trong cài đặt.</li>
+        <li>Nhấn "Cài đặt" và chờ hoàn tất.</li>
+      </ol>
+    </div>
+
+    <footer>
+      Muốn thay đổi giao diện hoặc thêm tracking? Mình có thể hỗ trợ tiếp.
+    </footer>
+  </div>
+
+  <script>
+    // Các thành phần DOM
+    const apkUrlInput = document.getElementById('apkUrl');
+    const setBtn = document.getElementById('setBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const statusEl = document.getElementById('status');
+    const hashBtn = document.getElementById('hashBtn');
+    const hashBox = document.getElementById('hashBox');
+    const hashVal = document.getElementById('hashVal');
+
+    let currentUrl = apkUrlInput.value.trim();
+
+    function updateStatus(text){ statusEl.textContent = text; }
+
+    // Gán URL mới
+    setBtn.addEventListener('click', () => {
+      const url = apkUrlInput.value.trim();
+      if(!url){ alert('Vui lòng nhập URL hợp lệ'); return; }
+      currentUrl = url;
+      prepareDownloadLink(currentUrl);
+      updateStatus('URL đã đặt: ' + currentUrl);
+    });
+
+    // Tạo và kích hoạt link download
+    function prepareDownloadLink(url){
+      downloadBtn.disabled = false;
+      // Tạo anchor ẩn — dùng thuộc tính download để cố gắng lưu file với tên gợi ý
+      downloadBtn.onclick = () => {
+        const a = document.createElement('a');
+        a.href = url;
+        // gợi ý tên file — nếu server trả header Content-Disposition thì sẽ ưu tiên
+        const suggestedName = url.split('/').pop() || 'app.apk';
+        a.setAttribute('download', suggestedName);
+        // mở trong tab mới nếu server không cho phép direct download
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        updateStatus('Bắt đầu tải xuống — nếu không xảy ra, kiểm tra đường dẫn và CORS/server headers.');
+      }
+    }
+
+    // Tự khởi tạo lần đầu
+    prepareDownloadLink(currentUrl);
+    updateStatus('Sẵn sàng — kiểm tra URL và nhấn "Tải file APK"');
+
+    // Tính SHA-256 (nếu server cho phép CORS)
+    async function computeSHA256(url){
+      try{
+        updateStatus('Đang fetch file để tính hash (cần CORS) ...');
+        const res = await fetch(url);
+        if(!res.ok) throw new Error('Fetch failed: ' + res.status);
+        const buf = await res.arrayBuffer();
+        const hashBuf = await crypto.subtle.digest('SHA-256', buf);
+        const hashArray = Array.from(new Uint8Array(hashBuf));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2,'0')).join('');
+        return hashHex;
+      }catch(e){
+        throw e;
+      }
+    }
+
+    hashBtn.addEventListener('click', async () => {
+      hashBox.style.display = 'none';
+      hashVal.textContent = '—';
+      try{
+        hashBtn.disabled = true;
+        const hash = await computeSHA256(currentUrl);
+        hashVal.textContent = hash;
+        hashBox.style.display = 'block';
+        updateStatus('Đã tính SHA-256. So sánh với giá trị trên server để đảm bảo file không bị thay đổi.');
+      }catch(err){
+        console.error(err);
+        updateStatus('Không thể fetch/tính hash — rất có thể do CORS hoặc URL không hợp lệ.');
+        alert('Lỗi khi fetch hoặc tính hash: ' + (err.message || err));
+      }finally{
+        hashBtn.disabled = false;
+      }
+    });
+
+    // Tùy chọn: phát hiện thiết bị
+    function isAndroid(){ return /Android/i.test(navigator.userAgent); }
+    if(!isAndroid()){
+      const note = document.createElement('div');
+      note.style.marginTop = '12px';
+      note.style.fontSize = '13px';
+      note.style.color = '#555';
+      note.textContent = 'Bạn đang không ở trên Android — người dùng Android sẽ cần tải và cài đặt file APK trên thiết bị của họ.';
+      document.querySelector('.card').appendChild(note);
+    }
+  </script>
+</body>
+</html>
