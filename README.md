@@ -1,18 +1,30 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Download APK</title>
+  <title>Tải APK</title>
   <style>
-    :root { --accent:#0b84ff; --bg:#f7f9fc; --card:#fff; }
-    body{font-family:Inter, system-ui, Arial; background:var(--bg); margin:0; padding:24px; color:#122; display:flex; align-items:center; justify-content:center; min-height:100vh}
-    .card{width:100%;max-width:760px;background:var(--card);border-radius:12px;box-shadow:0 6px 24px rgba(10,20,40,0.08);padding:22px}
-    h1{margin:0 0 8px;font-size:20px}
-    p.lead{margin:0 0 18px;color:#445;}
-    .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-    .meta{flex:1;min-width:220px}
-    .btn{background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;border:0;cursor:pointer;font-weight:600}
+    body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial;display:flex;min-height:100vh;align-items:center;justify-content:center;background:#f6f7fb;margin:0}
+    .card{background:#fff;padding:2rem;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.08);width:320px;text-align:center}
+    h1{font-size:1.25rem;margin:0 0 0.5rem}
+    p{color:#555;margin:0 0 1rem}
+    .btn{display:inline-block;padding:0.6rem 1rem;border-radius:8px;background:#2563eb;color:#fff;text-decoration:none;font-weight:600}
+    small{display:block;margin-top:1rem;color:#999}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Tải ứng dụng (APK)</h1>
+    <p>Nhấn nút bên dưới để tải file APK về máy Android của bạn.</p>
+
+    <!-- Nếu file app.apk nằm cùng thư mục với index.html -->
+    <a class="btn" href="app.apk" download="my-app.apk">Tải xuống APK</a>
+
+    <small>Lưu ý: bật Cài đặt -> Ứng dụng không rõ nguồn gốc để cài (Android).</small>
+  </div>
+</body>
+</html>
     .btn:disabled{opacity:0.6;cursor:not-allowed}
     .progressWrap{background:#eef3ff;border-radius:10px;height:14px;overflow:hidden;margin-top:12px}
     .progress{height:100%;width:0%;background:linear-gradient(90deg,#0b84ff,#5fc0ff)}
